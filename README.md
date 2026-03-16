@@ -22,27 +22,80 @@ Applying both filters yielded **1,095 high-quality orthologs** (23% of 4,845 tot
 
 ### 2. ASTRAL Species Tree Inference
 Two ASTRAL (v5.7.8) species trees were inferred using coalescent-based species tree estimation:
-```
-java -jar astral.5.7.8.jar -i all_orthologs_trees.tre -o ASTRAL_all_orthologs.tre
-java -jar astral.5.7.8.jar -i filtered_orthologs_trees.tre -o ASTRAL_filtered_orthologs.tre
-```
 
-The two trees were compared using RF distance (RAxML-NG v1.2.2), yielding **RF distance = 0** — the two topologies are identical.
+    # All orthologs
+    java -jar astral.5.7.8.jar \
+      -i all_orthologs_trees.tre \
+      -o ASTRAL_all_orthologs.tre
+
+    # Filtered orthologs
+    java -jar astral.5.7.8.jar \
+      -i filtered_orthologs_trees.tre \
+      -o ASTRAL_filtered_orthologs.tre
+
+The two trees were compared using RF distance (RAxML-NG v1.2.2), yielding **RF distance = 0** — the two topologies are identical. This confirms that the full ortholog dataset is phylogenetically robust and that filtering does not change the inferred topology.
 
 ### 3. Gene Tree Rooting
-All 4,845 ortholog gene trees were rooted using RootDigger v1.7.0 prior to CAnDI analysis.
+All 4,845 ortholog gene trees were rooted using **RootDigger v1.7.0** prior to CAnDI analysis:
+
+    cd InfoToCalc/
+
+    for aln in *-cln; do
+        prefix=~/CANDIforAIM1Orthologs/${aln}.treefile
+        if [ ! -f "${prefix}.rooted.tree" ]; then
+            ./rd \
+                --msa ${aln} \
+                --tree ${aln}.treefile \
+                --threads 2 \
+                --prefix ${prefix}
+        fi
+    done
 
 ### 4. CAnDI Concordance Analysis
-CAnDI was run in normal mode on the rooted ortholog gene trees against each species tree, with and without a bootstrap cutoff of 95.
+CAnDI was run in normal mode (--mode n) on the rooted ortholog gene trees against each species tree. Two runs were performed per species tree:
+
+**With bootstrap cutoff (95)** — nodes below 95% bootstrap support are excluded from analysis:
+
+    python3 CAnDI.py \
+      --mode n \
+      --species_tree ASTRAL_all_orthologs.tre \
+      --gene_folder RootedTrees/ \
+      --outfile_prefix CAnDI_all_95cutoff/CAnDI_all \
+      --cutoff 95
+
+**Without cutoff** — required to generate _total_analyzed.tre for Pie.py:
+
+    python3 CAnDI.py \
+      --mode n \
+      --species_tree ASTRAL_all_orthologs.tre \
+      --gene_folder RootedTrees/ \
+      --outfile_prefix CAnDI_all_nocutoff/CAnDI_all_nocutoff
+
+The same was repeated for the filtered orthologs species tree.
 
 ### 5. Pie Chart Visualization
-Pie charts showing concordance, conflict, and uninformative proportions per node were generated using CAnDI Pie.py with -at 4841.
+Pie charts showing concordance, conflict, and uninformative proportions per node were generated using CAnDI's Pie.py:
+
+    python3 Pie.py \
+      -f CAnDI_all_95cutoff/ \
+      -p CAnDI_all \
+      -t CAnDI_all_nocutoff/CAnDI_all_nocutoff_total_analyzed.tre \
+      -o le \
+      -a 3 \
+      -at 4841
+
+The -at 4841 flag specifies the total number of orthologs analyzed (the maximum node count from _total_analyzed.tre), ensuring uninformative gene trees are correctly represented in the pie charts. Each Node_X.svg file corresponds to a node in the species tree as labelled in CAnDI_all_labels.tre.
 
 ---
 
 ## Key Results
 
-- Both species trees are topologically identical (RF distance = 0)
+| Analysis | Species Tree | RF Distance |
+|----------|-------------|-------------|
+| All orthologs (n=4,845) | ASTRAL_all_orthologs.tre | — |
+| Filtered orthologs (n=1,095) | ASTRAL_filtered_orthologs.tre | 0 |
+
+- Both species trees are **topologically identical** (RF distance = 0)
 - The filtered subset recovers the same phylogeny using only 23% of the data
 - Pie charts reveal patterns of concordance and conflict across all 37 internal nodes
 
@@ -73,22 +126,26 @@ Pie charts showing concordance, conflict, and uninformative proportions per node
 ---
 
 ## Repository Structure
-```
-CANDIforAIM1Orthologs/
-├── ASTRAL_all_orthologs.tre
-├── ASTRAL_filtered_orthologs.tre
-├── Correlation_TreeStats.csv
-├── filtered_orthologs.csv
-├── RootedTrees/
-├── RootDigger_checkpoints/
-├── CAnDI_all_95cutoff/
-├── CAnDI_filtered_95cutoff/
-├── CAnDI_all_nocutoff/
-├── CAnDI_filtered_nocutoff/
-├── PieCharts_all/
-├── PieCharts_filtered/
-└── README.md
-```
+
+    CANDIforAIM1Orthologs/
+    |
+    |-- ASTRAL_all_orthologs.tre          # ASTRAL species tree from all 4,845 orthologs
+    |-- ASTRAL_filtered_orthologs.tre     # ASTRAL species tree from 1,095 filtered orthologs
+    |-- Correlation_TreeStats.csv         # TC, RTC, TCA, RTCA, Taxa, Pythia scores per ortholog
+    |-- filtered_orthologs.csv            # List of orthologs passing the quality filter
+    |
+    |-- RootedTrees/                      # 4,845 ortholog gene trees rooted with RootDigger v1.7.0
+    |-- RootDigger_checkpoints/           # RootDigger checkpoint files
+    |
+    |-- CAnDI_all_95cutoff/               # CAnDI results (all orthologs, bootstrap cutoff = 95)
+    |-- CAnDI_filtered_95cutoff/          # CAnDI results (filtered orthologs, bootstrap cutoff = 95)
+    |-- CAnDI_all_nocutoff/               # CAnDI results (all orthologs, no cutoff)
+    |-- CAnDI_filtered_nocutoff/          # CAnDI results (filtered orthologs, no cutoff)
+    |
+    |-- PieCharts_all/                    # Pie chart SVGs for all orthologs (Node_0 to Node_36)
+    |-- PieCharts_filtered/               # Pie chart SVGs for filtered orthologs (Node_0 to Node_36)
+    |
+    |-- README.md
 
 ---
 
