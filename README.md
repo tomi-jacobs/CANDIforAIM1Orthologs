@@ -1,108 +1,97 @@
-# Hi, I'm Tomi Jacobs
+# CAnDI Analysis of AIM1 Orthologs — Aizoaceae Phylogenomics
 
-I am a 3rd year PhD Candidate at the University of Illinois Chicago, studying the dynamics of computation and genetics — building bioinformatics pipelines by utilizing shell scripting, programming languages, and models to decode large-scale phylotranscriptomics data.
-
-A creative soul, inspired by the art of poetry, the lens of photography, period pieces & timeless books.
+This repository contains a gene tree concordance and conflict analysis using **CAnDI (Conflict and Duplication Identifier)** on 4,845 orthologous gene trees from *Aizoaceae* (ice plants), representing 39 taxa. The analysis compares two ASTRAL species trees — one built from all orthologs and one built from a filtered high-quality subset — to assess phylogenetic signal and gene tree discordance across the species tree.
 
 ---
 
-## Research Interests
+## Biological Context
 
-Bioinformatics: Methods development & Phylogenomics
-
----
-
-## Research Highlights
-
-<table>
-  <tr>
-    <td align="center" width="25%">
-      <img src="pythia_difficulty.png" width="100%" /><br/>
-      <b>Pythia Difficulty Score</b><br/>
-      <sub>Ph.D. — UIC</sub>
-    </td>
-    <td align="center" width="25%">
-      <img src="conflict_analysis.png" width="100%" /><br/>
-      <b>Conflict Analysis</b><br/>
-      <sub>Ph.D. — UIC</sub>
-    </td>
-    <td align="center" width="25%">
-      <img src="ma_plot.png" width="100%" /><br/>
-      <b>Differential Gene Expression</b><br/>
-      <sub>M.S. — Cornell</sub>
-    </td>
-    <td align="center" width="25%">
-      <img src="sample_correlation.png" width="100%" /><br/>
-      <b>Sample Correlation Heatmap</b><br/>
-      <sub>M.S. — Cornell</sub>
-    </td>
-  </tr>
-</table>
+This work is part of AIM 1 of a broader phylogenomics project on *Aizoaceae* (39 taxa). Orthologs were extracted from homologous gene families using a Maximum Inclusion (MI) paralog pruning approach. The central question addressed here is: **do high-quality orthologs (selected using information-theoretic scores and Pythia difficulty) recover the same species tree topology and concordance patterns as the full ortholog dataset?**
 
 ---
 
-## Featured Projects
+## Methods
 
-### Pythia Difficulty Score Analysis *(University of Illinois Chicago, Ph.D.)*
-Applied the Pythia tool to evaluate per-dataset difficulty scores across phylogenetic clusters. The distribution of predicted difficulty scores was used to classify datasets as easy, intermediate, or difficult — informing downstream phylogenetic inference strategies.
+### 1. Ortholog Filtering
+Before running the concordance analysis, orthologs were pre-screened for quality using two independent metrics:
 
----
+- **Pythia difficulty** (Haag & Stamatakis, 2025): A machine-learning predictor of phylogenetic analysis difficulty on a scale of 0 (easy) to 1 (difficult). Orthologs with Pythia difficulty < 0.5 were retained.
+- **abs(TCA)**: The absolute Transfer Concordance with Adjustments score, computed using RAxML. Orthologs with abs(TCA) in the top 25% were retained.
 
-### Conflict Analysis *(University of Illinois Chicago, Ph.D.)*
-Phylogenetic conflict analysis examining the proportion of concordant, uninformative, and conflicting sites across the dataset. Each category reflects the degree of agreement between gene trees and the species tree.
+Applying both filters yielded **1,095 high-quality orthologs** (23% of 4,845 total). Spearman correlations confirmed a strong negative relationship between all four information-theoretic scores (TC, RTC, TCA, RTCA) and Pythia difficulty (r = -0.66, p < 0.001), validating the use of these scores as proxies for phylogenetic signal quality.
 
----
+### 2. ASTRAL Species Tree Inference
+Two ASTRAL (v5.7.8) species trees were inferred using coalescent-based species tree estimation:
+```
+java -jar astral.5.7.8.jar -i all_orthologs_trees.tre -o ASTRAL_all_orthologs.tre
+java -jar astral.5.7.8.jar -i filtered_orthologs_trees.tre -o ASTRAL_filtered_orthologs.tre
+```
 
-### WGCNA for Sugar Maple Transcriptomics *(Cornell University, M.S.)*
-Carried out bioinformatics research using Weighted Gene Correlation Network Analysis (WGCNA) to identify key genes regulating drought resistance in *Acer saccharum* (Sugar Maple). Pipeline included DESeq2 differential expression analysis, variance stabilizing transformation, and co-expression network construction.
+The two trees were compared using RF distance (RAxML-NG v1.2.2), yielding **RF distance = 0** — the two topologies are identical.
 
-🔗 [View Repository](https://github.com/tomi-jacobs/Weighted-Gene-Correlation-Network-Analysis-WGCNA-for-MapleTranscriptomics)
+### 3. Gene Tree Rooting
+All 4,845 ortholog gene trees were rooted using RootDigger v1.7.0 prior to CAnDI analysis.
 
----
+### 4. CAnDI Concordance Analysis
+CAnDI was run in normal mode on the rooted ortholog gene trees against each species tree, with and without a bootstrap cutoff of 95.
 
-### Phytosociological Survey of Weeds on a Date Palm Plantation *(University of Ilorin, B.S.)*
-Conducted a field-based phytosociological survey to identify and characterize weed species compositions within a Date palm (*Phoenix dactylifera*) plantation. This undergraduate research laid the foundation for integrating botanical fieldwork with data analytics.
-
----
-
-## Skills & Tools
-
-![Python](https://img.shields.io/badge/Python-3776AB?style=for-the-badge&logo=python&logoColor=white)
-![R](https://img.shields.io/badge/R-276DC3?style=for-the-badge&logo=r&logoColor=white)
-![Bash](https://img.shields.io/badge/Bash-4EAA25?style=for-the-badge&logo=gnubash&logoColor=white)
-![Linux](https://img.shields.io/badge/Linux-FCC624?style=for-the-badge&logo=linux&logoColor=black)
-![HPC](https://img.shields.io/badge/HPC-High--Performance%20Computing-blueviolet?style=for-the-badge)
+### 5. Pie Chart Visualization
+Pie charts showing concordance, conflict, and uninformative proportions per node were generated using CAnDI Pie.py with -at 4841.
 
 ---
 
-## GitHub Stats
+## Key Results
 
-<p align="center">
-  <img src="https://github-readme-stats.vercel.app/api?username=tomi-jacobs&show_icons=true&theme=default&hide_border=true&hide=prs&include_all_commits=true&count_private=true" alt="Tomi's GitHub Stats" />
-</p>
-
-<p align="center">
-  <img src="https://github-readme-stats.vercel.app/api/top-langs/?username=tomi-jacobs&layout=donut&theme=default&hide_border=true" alt="Top Languages" />
-</p>
+- Both species trees are topologically identical (RF distance = 0)
+- The filtered subset recovers the same phylogeny using only 23% of the data
+- Pie charts reveal patterns of concordance and conflict across all 37 internal nodes
 
 ---
 
-## Education
+## Tools and Versions
 
-| Degree | Institution | Field |
-|--------|-------------|-------|
-| Ph.D. Candidate | University of Illinois Chicago | Bioinformatics, Phylogenetics, Evolutionary Biology |
-| M.S. | Cornell University | Bioinformatics / Plant Transcriptomics |
-| M.S. | Delaware State University | Plant Genetics & Bioinformatics |
-| B.S. | University of Ilorin, Nigeria | Plant Biology *(Minor: Data Analytics)* |
-
----
-
-## Connect With Me
-
-[![GitHub](https://img.shields.io/badge/GitHub-tomi--jacobs-181717?style=for-the-badge&logo=github)](https://github.com/tomi-jacobs)
-[![LinkedIn](https://img.shields.io/badge/LinkedIn-Tomi%20Jacobs-0077B5?style=for-the-badge&logo=linkedin&logoColor=white)](https://www.linkedin.com/in/tomijacobs/)
+| Tool | Version | Purpose |
+|------|---------|---------|
+| ASTRAL | 5.7.8 | Coalescent species tree inference |
+| RootDigger | 1.7.0 | Gene tree rooting |
+| CAnDI | — | Concordance/conflict analysis |
+| RAxML-NG | 1.2.2 | RF distance computation |
+| Pythia | 2.0.0 | Phylogenetic difficulty prediction |
 
 ---
 
-*"Advancing science, one code at a time."*
+## Citations
+
+> Haag, J. & Stamatakis, A. (2025). Pythia 2.0: New Data, New Prediction Model, New Features. bioRxiv. https://doi.org/10.1101/2025.03.25.645182
+
+> Kozlov, A.M. et al. (2019). RAxML-NG: a fast, scalable and user-friendly tool for maximum likelihood phylogenetic inference. Bioinformatics, 35(21):4453-4455.
+
+> Zhang, C. et al. (2018). ASTRAL-III: polynomial time species tree reconstruction from partially resolved gene trees. BMC Bioinformatics, 19(S6):153.
+
+> Robertson, H.M., Walker, J.F. & Moyroud, E. (2025). CAnDI: a new tool to investigate conflict in homologous gene trees and explain convergent trait evolution. Systematic Biology, syaf028. https://doi.org/10.1093/sysbio/syaf028
+
+---
+
+## Repository Structure
+```
+CANDIforAIM1Orthologs/
+├── ASTRAL_all_orthologs.tre
+├── ASTRAL_filtered_orthologs.tre
+├── Correlation_TreeStats.csv
+├── filtered_orthologs.csv
+├── RootedTrees/
+├── RootDigger_checkpoints/
+├── CAnDI_all_95cutoff/
+├── CAnDI_filtered_95cutoff/
+├── CAnDI_all_nocutoff/
+├── CAnDI_filtered_nocutoff/
+├── PieCharts_all/
+├── PieCharts_filtered/
+└── README.md
+```
+
+---
+
+## Author
+
+**Tomi Jacobs** — PhD Candidate, Computational Biology / Phylogenomics
