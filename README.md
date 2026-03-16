@@ -1,0 +1,1 @@
+> Robertson, H.M., Walker, J.F. & Moyroud, E. (2025). *CAnDI: a new tool to investigate conflict in homologous gene trees and explain convergent trait evolution*. Systematic Biology, syaf028. https://doi.org/10.1093/sysbio/syaf028
