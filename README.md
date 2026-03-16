@@ -6,7 +6,7 @@ This repository contains a gene tree concordance and conflict analysis using **C
 
 ## Biological Context
 
-This work is part of AIM 1 of a broader phylogenomics project on *Aizoaceae* (39 taxa). Orthologs were extracted from homologous gene families using a Maximum Inclusion (MI) paralog pruning approach. The central question addressed here is: **do high-quality orthologs (selected using information-theoretic scores and Pythia difficulty) recover the same species tree topology and concordance patterns as the full ortholog dataset?**
+This work is part of AIM 1 of a broader phylogenomics project on *Aizoaceae* (39 taxa). Orthologs used in this analysis were previously extracted from homologous gene families during the AIM1 pipeline using a Maximum Inclusion (MI) paralog pruning approach (Yang & Smith, 2014; Morales-Briones et al., 2021), re-aligned with PRANK, filtered with pxclsq (30% occupancy), and gene trees inferred with IQ-TREE2 using ModelFinder automatic model selection and 1000 ultrafast bootstraps. The central question addressed here is: **do high-quality orthologs (selected using information-theoretic scores and Pythia difficulty) recover the same species tree topology and concordance patterns as the full ortholog dataset?**
 
 ---
 
@@ -122,6 +122,10 @@ The -at 4841 flag specifies the total number of orthologs analyzed (the maximum 
 > Zhang, C. et al. (2018). ASTRAL-III: polynomial time species tree reconstruction from partially resolved gene trees. BMC Bioinformatics, 19(S6):153.
 
 > Robertson, H.M., Walker, J.F. & Moyroud, E. (2025). CAnDI: a new tool to investigate conflict in homologous gene trees and explain convergent trait evolution. Systematic Biology, syaf028. https://doi.org/10.1093/sysbio/syaf028
+
+> Yang, Y. & Smith, S.A. (2014). Orthology inference in nonmodel organisms using transcriptomes and low-coverage genomes. Molecular Biology and Evolution, 31(11):3081-3092.
+
+> Morales-Briones, D.F. et al. (2021). Disentangling sources of gene tree discordance in phylogenomic data sets. Systematic Biology, 70(3):591-609.
 
 ---
 
