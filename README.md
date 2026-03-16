@@ -156,3 +156,44 @@ The -at 4841 flag specifies the total number of orthologs analyzed (the maximum 
 ## Author
 
 **Tomi Jacobs** — PhD Candidate, Computational Biology / Phylogenomics
+
+---
+
+## BES (Branch Estimation Synthesizer) Analysis
+
+### What is BES?
+BES (Branch Estimation Synthesizer) is a program that computes concordance-informed branch lengths for a species tree. Unlike conventional branch lengths which reflect substitutions per site, BES branch lengths are derived exclusively from gene trees that are concordant with the species tree at each node. For each internal branch, BES identifies all gene trees that agree with that bipartition and computes summary statistics (mean, median, min, max, 95% CI, and count) of their branch lengths. This provides a powerful way to quantify how much evolutionary time separates successive speciation events, using only the most reliable phylogenetic signal.
+
+### Why run BES?
+For a rapidly radiating group like *Aizoaceae* — the fastest radiating plant family on Earth — BES branch lengths are particularly informative. If speciation events occurred in rapid succession, there would be very little time for gene trees to sort between splits, resulting in near-zero concordance-informed branch lengths at internal nodes. This is a direct molecular signature of rapid radiation.
+
+### How BES was run
+Both ASTRAL species trees were first unrooted using pxrr (Phyx v1.2):
+
+    pxrr -t ASTRAL_all_orthologs.tre -u -o ASTRAL_all_orthologs.ur
+    pxrr -t ASTRAL_filtered_orthologs.tre -u -o ASTRAL_filtered_orthologs.ur
+
+BES was then run on both unrooted species trees using Python 2.7:
+
+    # All orthologs
+    python2.7 ~/data/BES/src/BES.py \
+      -t all_orthologs_trees.tre \
+      -m ASTRAL_all_orthologs.ur \
+      -o BES_all/BES_all_orthologs
+
+    # Filtered orthologs
+    python2.7 ~/data/BES/src/BES.py \
+      -t filtered_orthologs_trees.tre \
+      -m ASTRAL_filtered_orthologs.ur \
+      -o BES_filtered/BES_filtered_orthologs
+
+Each output .tre file contains 7 trees: mean, median, minimum, maximum, lower 95% CI, upper 95% CI, and number of concordant edges per node. The median tree (Tree 2) was used for interpretation, consistent with the approach used for the homolog analysis.
+
+### BES Results and Biological Interpretation
+BES was run on three datasets for comparison: homologs (from AIM1), all 4,845 orthologs, and the 1,095 filtered orthologs. All three datasets recovered highly consistent results:
+
+- The outgroup lineages (KEBO, GIPH2, ANLI2, SAPU, RIHU2, SAS7, ZAPE2, SEHU2, SEPO2, SEVE2) consistently showed longer concordance-informed branch lengths across all three datasets, reflecting more accumulated evolutionary change in these lineages.
+- Internal branches within the core SAS clade were near-zero or exactly zero across all three datasets, indicating that multiple lineages diverged almost simultaneously with negligible evolutionary time between successive speciation events.
+- The filtered ortholog dataset showed the most zero-length internal branches, consistent with the expectation that higher-quality gene trees (low Pythia difficulty, high abs(TCA)) provide a cleaner signal of rapid radiation.
+
+These results provide strong molecular evidence that *Aizoaceae* underwent explosive diversification, with successive speciation events occurring so rapidly that gene trees could not sort between splits. The consistency of this pattern across homologs, all orthologs, and filtered orthologs confirms that this signal is robust and not an artifact of gene tree noise or dataset composition.
