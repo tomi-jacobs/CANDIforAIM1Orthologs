@@ -1,0 +1,5 @@
+pxrr -t ASTRAL_all_orthologs.tre -r -o ASTRAL_all_orthologs.ur
+pxrr -t ASTRAL_filtered_orthologs.tre -r -o ASTRAL_filtered_orthologs.ur
+pxrr -t ASTRAL_all_orthologs.tre -u -o ASTRAL_all_orthologs.ur
+pxrr -t ASTRAL_filtered_orthologs.tre -u -o ASTRAL_filtered_orthologs.ur
+pxlstr -t ASTRAL_all_orthologs.ur
